@@ -7,6 +7,7 @@
     "start": "NODE_ENV=development budo example.js",
     "build": "NODE_ENV=production browserify example.js -g hyperxify -g unassertify",
     "stat": "npm run build | gzip-size | pretty-bytes",
+    "doc": "documentation lint && documentation readme -g -s api",
     "test": "standard"
   },
   "author": "Callum Jefferies <callum@callumj.uk> (http://callumj.uk/)",
@@ -24,6 +25,7 @@
   "devDependencies": {
     "browserify": "^13.0.0",
     "budo": "^8.0.4",
+    "documentation": "^4.0.0-beta",
     "gzip-size-cli": "^1.0.0",
     "hyperxify": "^2.0.1",
     "pretty-bytes-cli": "^1.0.0",
