@@ -1,5 +1,20 @@
 # editor
 
+-   [x] block schema and validation
+-   [x] CRUD blocks
+-   [x] documented public API
+-   [x] self-contained editor constructor
+-   [x] state-driven user interface
+-   [x] versioned block types
+-   [ ] block type primitives
+-   [ ] block type state management
+-   [ ] contributing guide
+-   [ ] customisable styling
+-   [ ] i18n
+-   [ ] rich-text editing
+-   [ ] tests
+-   [ ] undo
+
 ## example
 
 ```js
@@ -19,7 +34,7 @@ document.body.appendChild(editor.tree)
 
 ### Editor
 
-[index.js:24-37](https://github.com/callum/editor-prototype/blob/94cdf4b522a278f885dee0bf85a3d599a2fc308a/index.js#L24-L37 "Source code on GitHub")
+[index.js:24-37](https://github.com/callum/editor-prototype/blob/e19b5810507169e51e5f4f4a999bd6c6c5fae360/index.js#L24-L37 "Source code on GitHub")
 
 Create an editor
 
@@ -35,7 +50,7 @@ const editor = new Editor()
 
 #### addBlockType
 
-[index.js:51-58](https://github.com/callum/editor-prototype/blob/94cdf4b522a278f885dee0bf85a3d599a2fc308a/index.js#L51-L58 "Source code on GitHub")
+[index.js:51-58](https://github.com/callum/editor-prototype/blob/e19b5810507169e51e5f4f4a999bd6c6c5fae360/index.js#L51-L58 "Source code on GitHub")
 
 Add block type
 
@@ -57,7 +72,7 @@ editor.addBlockType(require('editor/text'))
 
 #### createBlock
 
-[index.js:67-75](https://github.com/callum/editor-prototype/blob/94cdf4b522a278f885dee0bf85a3d599a2fc308a/index.js#L67-L75 "Source code on GitHub")
+[index.js:67-75](https://github.com/callum/editor-prototype/blob/e19b5810507169e51e5f4f4a999bd6c6c5fae360/index.js#L67-L75 "Source code on GitHub")
 
 Create block
 
@@ -74,7 +89,7 @@ editor.createBlock('text')
 
 #### deleteBlock
 
-[index.js:84-87](https://github.com/callum/editor-prototype/blob/94cdf4b522a278f885dee0bf85a3d599a2fc308a/index.js#L84-L87 "Source code on GitHub")
+[index.js:84-87](https://github.com/callum/editor-prototype/blob/e19b5810507169e51e5f4f4a999bd6c6c5fae360/index.js#L84-L87 "Source code on GitHub")
 
 Delete block
 
@@ -91,7 +106,7 @@ editor.deleteBlock(123)
 
 #### updateBlock
 
-[index.js:97-101](https://github.com/callum/editor-prototype/blob/94cdf4b522a278f885dee0bf85a3d599a2fc308a/index.js#L97-L101 "Source code on GitHub")
+[index.js:97-101](https://github.com/callum/editor-prototype/blob/e19b5810507169e51e5f4f4a999bd6c6c5fae360/index.js#L97-L101 "Source code on GitHub")
 
 Update block data
 
@@ -109,7 +124,7 @@ editor.updateBlock(123, { text: 'abc' })
 
 #### validate
 
-[index.js:110-116](https://github.com/callum/editor-prototype/blob/94cdf4b522a278f885dee0bf85a3d599a2fc308a/index.js#L110-L116 "Source code on GitHub")
+[index.js:110-116](https://github.com/callum/editor-prototype/blob/e19b5810507169e51e5f4f4a999bd6c6c5fae360/index.js#L110-L116 "Source code on GitHub")
 
 Validate all block data
 
@@ -124,7 +139,7 @@ Returns **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refe
 
 #### validateBlock
 
-[index.js:129-143](https://github.com/callum/editor-prototype/blob/94cdf4b522a278f885dee0bf85a3d599a2fc308a/index.js#L129-L143 "Source code on GitHub")
+[index.js:129-143](https://github.com/callum/editor-prototype/blob/e19b5810507169e51e5f4f4a999bd6c6c5fae360/index.js#L129-L143 "Source code on GitHub")
 
 Validate block data
 
