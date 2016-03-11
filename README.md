@@ -34,8 +34,6 @@ document.body.appendChild(editor.tree)
 
 ### Editor
 
-[index.js:24-37](https://github.com/callum/editor-prototype/blob/e19b5810507169e51e5f4f4a999bd6c6c5fae360/index.js#L24-L37 "Source code on GitHub")
-
 Create an editor
 
 **Parameters**
@@ -49,8 +47,6 @@ const editor = new Editor()
 ```
 
 #### addBlockType
-
-[index.js:51-58](https://github.com/callum/editor-prototype/blob/e19b5810507169e51e5f4f4a999bd6c6c5fae360/index.js#L51-L58 "Source code on GitHub")
 
 Add block type
 
@@ -72,8 +68,6 @@ editor.addBlockType(require('editor/text'))
 
 #### createBlock
 
-[index.js:67-75](https://github.com/callum/editor-prototype/blob/e19b5810507169e51e5f4f4a999bd6c6c5fae360/index.js#L67-L75 "Source code on GitHub")
-
 Create block
 
 **Parameters**
@@ -88,8 +82,6 @@ editor.createBlock('text')
 ```
 
 #### deleteBlock
-
-[index.js:84-87](https://github.com/callum/editor-prototype/blob/e19b5810507169e51e5f4f4a999bd6c6c5fae360/index.js#L84-L87 "Source code on GitHub")
 
 Delete block
 
@@ -106,8 +98,6 @@ editor.deleteBlock(123)
 
 #### updateBlock
 
-[index.js:97-101](https://github.com/callum/editor-prototype/blob/e19b5810507169e51e5f4f4a999bd6c6c5fae360/index.js#L97-L101 "Source code on GitHub")
-
 Update block data
 
 **Parameters**
@@ -122,39 +112,41 @@ const editor = new Editor()
 editor.updateBlock(123, { text: 'abc' })
 ```
 
-#### validate
-
-[index.js:110-116](https://github.com/callum/editor-prototype/blob/e19b5810507169e51e5f4f4a999bd6c6c5fae360/index.js#L110-L116 "Source code on GitHub")
-
-Validate all block data
-
-**Examples**
-
-```javascript
-const editor = new Editor()
-editor.validate()
-```
-
-Returns **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** 
-
 #### validateBlock
-
-[index.js:129-143](https://github.com/callum/editor-prototype/blob/e19b5810507169e51e5f4f4a999bd6c6c5fae360/index.js#L129-L143 "Source code on GitHub")
 
 Validate block data
 
 **Parameters**
 
--   `block` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
-    -   `block.data` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** data to validate
-    -   `block.name` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** name of the block type to validate against
+-   `id` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** id of the block to validate
 
 **Examples**
 
 ```javascript
 const editor = new Editor()
-const block = { name: 'text', data: { text: 'abc' } }
-editor.validateBlock(block)
+editor.validateBlock(123)
 ```
 
 Returns **([Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)\|[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array))** an array of errors if there are any, otherwise `true`
+
+#### state
+
+Get editor state
+
+**Examples**
+
+```javascript
+const editor = new Editor()
+editor.state
+```
+
+#### tree
+
+Get editor DOM tree
+
+**Examples**
+
+```javascript
+const editor = new Editor()
+document.body.appendChild(editor.tree)
+```

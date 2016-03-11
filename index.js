@@ -26,15 +26,45 @@ function Editor (initialState) {
   this._blockTypes = new Map()
   this._validators = new Map()
   this._app = vapp(vdom)
-
-  const render = this._app.start(modifier, state)
-  Object.defineProperty(this, 'tree', {
-    get () {
-      assert(this.validate(), 'invalid block data')
-      return render(main.bind(null, this))
-    }
-  })
+  this._render = this._app.start(modifier, state)
 }
+
+/**
+* Get editor DOM tree
+* @name tree
+* @memberof Editor
+* @type {Object}
+* @example
+* const editor = new Editor()
+* document.body.appendChild(editor.tree)
+*/
+Object.defineProperty(Editor.prototype, 'tree', {
+  get () {
+    this.state.blocks.forEach(function (block) {
+      const errors = this.validateBlock(block.id)
+      if (errors.length) {
+        const error = errors[0]
+        throw `${error.field} ${error.message} at block with id '${block.id}'`
+      }
+    }, this)
+    return this._render(main.bind(null, this))
+  }
+})
+
+/**
+* Get editor state
+* @name state
+* @memberof Editor
+* @type {Object}
+* @example
+* const editor = new Editor()
+* editor.state
+*/
+Object.defineProperty(Editor.prototype, 'state', {
+  get () {
+    return this._app.store.getState()
+  }
+})
 
 /**
 * Add block type
@@ -55,6 +85,7 @@ Editor.prototype.addBlockType = function addBlockType (blockType) {
   assert.equal(typeof blockType.schema, 'object', 'schema must be an object')
   assert.equal(typeof blockType.initialData, 'object', 'initial data must be an object')
   this._blockTypes.set(blockType.name, blockType)
+  this._validators.set(blockType.name, validator(blockType.schema))
 }
 
 /**
@@ -101,42 +132,21 @@ Editor.prototype.updateBlock = function updateBlock (id, data) {
 }
 
 /**
-* Validate all block data
-* @return {Boolean}
-* @example
-* const editor = new Editor()
-* editor.validate()
-*/
-Editor.prototype.validate = function validate () {
-  const state = this._app.store.getState()
-  for (var block of state.blocks) {
-    if (!this.validateBlock(block)) return false
-  }
-  return true
-}
-
-/**
 * Validate block data
-* @param {Object} block
-* @param {Object} block.data - data to validate
-* @param {string} block.name - name of the block type to validate against
+* @param {number} id - id of the block to validate
 * @return {Boolean|Array} an array of errors if there are any, otherwise `true`
 * @example
 * const editor = new Editor()
-* const block = { name: 'text', data: { text: 'abc' } }
-* editor.validateBlock(block)
+* editor.validateBlock(123)
 */
-Editor.prototype.validateBlock = function validateBlock (block) {
-  assert.equal(typeof block, 'object', 'block must be an object')
-  assert.equal(typeof block.data, 'object', 'block.data must be an object')
-  assert.equal(typeof block.name, 'string', 'block.name must be a string')
+Editor.prototype.validateBlock = function validateBlock (id) {
+  assert.equal(typeof id, 'number', 'id must be a number')
+  const block = this.state.blocks.find(function (block) {
+    return block.id === id
+  })
   const blockType = this._getBlockType(block.name)
   if (equal(block.data, blockType.initialData)) return true
-  var validate = this._validators.get(blockType)
-  if (!validate) {
-    validate = validator(blockType.schema)
-    this._validators.set(blockType, validate)
-  }
+  const validate = this._validators.get(blockType.name)
   validate(block.data)
   if (validate.errors && validate.errors.length) return validate.errors
   return true

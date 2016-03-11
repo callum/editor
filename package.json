@@ -7,7 +7,7 @@
     "start": "NODE_ENV=development budo example.js",
     "build": "NODE_ENV=production browserify example.js -g hyperxify -g unassertify",
     "stat": "npm run build | gzip-size | pretty-bytes",
-    "doc": "documentation lint && documentation readme -g -s api",
+    "doc": "documentation lint && documentation readme -s api",
     "test": "standard"
   },
   "author": "Callum Jefferies <callum@callumj.uk> (http://callumj.uk/)",
