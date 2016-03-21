@@ -6,12 +6,13 @@ const validator = require('is-my-json-valid')
 const vapp = require('virtual-app')
 const vdom = require('virtual-dom')
 const xtend = require('xtend')
+const vhook = require('virtual-hyperscript-hook')
 
 const CREATE_BLOCK = 'CREATE_BLOCK'
 const UPDATE_BLOCK = 'UPDATE_BLOCK'
 const DELETE_BLOCK = 'DELETE_BLOCK'
 
-const hx = hyperx(vdom.h)
+const hx = hyperx(vhook(vdom.h))
 
 module.exports = Editor
 
@@ -91,17 +92,19 @@ Editor.prototype.addBlockType = function addBlockType (blockType) {
 /**
 * Create block
 * @param {string} name – block type name
+* @param {number} blockId – id of block to insert after
 * @example
 * const editor = new Editor()
 * editor.createBlock('text')
 */
-Editor.prototype.createBlock = function createBlock (name) {
+Editor.prototype.createBlock = function createBlock (name, blockId) {
   const blockType = this._getBlockType(name)
   this._app.store({
     type: CREATE_BLOCK,
     name: blockType.name,
     version: blockType.version,
-    data: blockType.initialData
+    data: blockType.initialData,
+    blockId
   })
 }
 
@@ -159,55 +162,63 @@ Editor.prototype._getBlockType = function getBlockType (name) {
 
 function modifier (action, state) {
   if (action.type === CREATE_BLOCK) {
-    return {
-      blocks: [].concat(state.blocks, [{
-        id: Date.now(),
-        name: action.name,
-        version: action.version,
-        data: action.data
-      }])
+    var targetIndex = state.blocks.length
+    if (typeof action.blockId !== 'undefined') {
+      targetIndex = state.blocks.findIndex(function (block) {
+        return block.id === action.blockId
+      }) + 1
     }
+    return xtend(state, {
+      blocks: state.blocks.slice(0, targetIndex)
+        .concat([{
+          id: Date.now(),
+          name: action.name,
+          version: action.version,
+          data: action.data
+        }])
+        .concat(state.blocks.slice(targetIndex))
+    })
   }
 
   if (action.type === UPDATE_BLOCK) {
-    return {
+    return xtend(state, {
       blocks: state.blocks.map(function (block) {
         if (block.id === action.id) {
           return xtend(block, { data: xtend(block.data, action.data) })
         }
         return block
       })
-    }
+    })
   }
 
   if (action.type === DELETE_BLOCK) {
-    return {
+    return xtend(state, {
       blocks: state.blocks.filter(function (block) {
         return block.id !== action.id
       })
-    }
+    })
+  }
+
+  if (action.type === 'SHOW_TOOLBAR') {
+    return xtend(state, { toolbar: action.blockId })
+  }
+
+  if (action.type === 'HIDE_TOOLBAR') {
+    return xtend(state, { toolbar: null })
   }
 }
 
 function main (editor, state) {
   return hx`<main>
-    ${state.blocks.map(block.bind(null, editor))}
-    ${toolbar(editor, hx, state)}
+    ${state.blocks.map(function (b) {
+      var t
+      if (editor.state.toolbar === b.id) t = toolbar(editor, state, b.id)
+      return hx`<div>
+        ${block(editor, b)}
+        ${t}
+      </div>`
+    })}
   </main>`
-}
-
-function toolbar (editor, state) {
-  const blockTypes = Array.from(editor._blockTypes.values())
-
-  return blockTypes.map(function (blockType) {
-    return hx`<button onclick=${createBlock.bind(null, blockType.name)}>
-      Create ${blockType.name} block
-    </button>`
-  })
-
-  function createBlock (name) {
-    editor.createBlock(name)
-  }
 }
 
 function block (editor, state) {
@@ -221,4 +232,27 @@ function block (editor, state) {
   function deleteBlock () {
     editor.deleteBlock(state.id)
   }
+}
+
+function toolbar (editor, state, blockId) {
+  const blockTypes = Array.from(editor._blockTypes.values())
+
+  return hx`<div>
+    ${blockTypes.map(function (blockType, i) {
+      var hook
+      if (i === 0) hook = focusElement
+      return hx`<button hook=${hook} onclick=${createBlock.bind(null, blockType.name)}>
+        Create ${blockType.name} block
+      </button>`
+    })}
+  </div>`
+
+  function createBlock (name) {
+    editor.createBlock(name, blockId)
+    editor._app.store({ type: 'HIDE_TOOLBAR' })
+  }
+}
+
+function focusElement (element) {
+  window.setTimeout(element.focus.bind(element), 0)
 }
