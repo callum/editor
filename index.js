@@ -1,17 +1,18 @@
 const assert = require('assert')
 const defined = require('defined')
+const emitter = require('store-emitter')
 const equal = require('deep-equal')
-const hyperx = require('hyperx')
 const validator = require('is-my-json-valid')
-const vapp = require('virtual-app')
-const vdom = require('virtual-dom')
 const xtend = require('xtend')
+const yo = require('yo-yo')
 
 const CREATE_BLOCK = 'CREATE_BLOCK'
 const UPDATE_BLOCK = 'UPDATE_BLOCK'
 const DELETE_BLOCK = 'DELETE_BLOCK'
-
-const hx = hyperx(vdom.h)
+const FOCUS_BLOCK = 'FOCUS_BLOCK'
+const DEFOCUS_BLOCK = 'DEFOCUS_BLOCK'
+const SHOW_TOOLBAR = 'SHOW_TOOLBAR'
+const HIDE_TOOLBAR = 'HIDE_TOOLBAR'
 
 module.exports = Editor
 
@@ -25,29 +26,36 @@ function Editor (initialState) {
   const state = defined(initialState, { blocks: [] })
   this._blockTypes = new Map()
   this._validators = new Map()
-  this._app = vapp(vdom)
-  this._render = this._app.start(modifier, state)
+  this._emitter = emitter(modifier, state)
+  this._emit = this._emitter
+  this._emitter.on('*', handleUpdate.bind(this))
+
+  function handleUpdate (_, state) {
+    yo.update(this.element, main(this, state))
+  }
 }
 
 /**
-* Get editor DOM tree
-* @name tree
+* Get editor DOM element
+* @name element
 * @memberof Editor
 * @type {Object}
 * @example
 * const editor = new Editor()
-* document.body.appendChild(editor.tree)
+* document.body.appendChild(editor.element)
 */
-Object.defineProperty(Editor.prototype, 'tree', {
+Object.defineProperty(Editor.prototype, 'element', {
   get () {
+    if (typeof this._element !== 'undefined') return this._element
     this.state.blocks.forEach(function (block) {
       const errors = this.validateBlock(block.id)
       if (errors.length) {
         const error = errors[0]
-        throw `${error.field} ${error.message} at block with id '${block.id}'`
+        throw new Error(`${error.field} ${error.message} at block with id '${block.id}'`)
       }
     }, this)
-    return this._render(main.bind(null, this))
+    this._element = main(this, this.state)
+    return this._element
   }
 })
 
@@ -62,7 +70,7 @@ Object.defineProperty(Editor.prototype, 'tree', {
 */
 Object.defineProperty(Editor.prototype, 'state', {
   get () {
-    return this._app.store.getState()
+    return this._emitter.getState()
   }
 })
 
@@ -91,18 +99,24 @@ Editor.prototype.addBlockType = function addBlockType (blockType) {
 /**
 * Create block
 * @param {string} name – block type name
+* @param {number} afterBlockId – id of block to insert after
+* @return {number} id of the block
 * @example
 * const editor = new Editor()
 * editor.createBlock('text')
 */
-Editor.prototype.createBlock = function createBlock (name) {
+Editor.prototype.createBlock = function createBlock (name, afterBlockId) {
   const blockType = this._getBlockType(name)
-  this._app.store({
+  const id = Date.now()
+  this._emit({
     type: CREATE_BLOCK,
     name: blockType.name,
     version: blockType.version,
-    data: blockType.initialData
+    data: blockType.initialData,
+    id,
+    afterBlockId
   })
+  return id
 }
 
 /**
@@ -114,7 +128,7 @@ Editor.prototype.createBlock = function createBlock (name) {
 */
 Editor.prototype.deleteBlock = function deleteBlock (id) {
   assert.equal(typeof id, 'number', 'id must be a number')
-  this._app.store({ type: DELETE_BLOCK, id })
+  this._emit({ type: DELETE_BLOCK, id })
 }
 
 /**
@@ -128,7 +142,51 @@ Editor.prototype.deleteBlock = function deleteBlock (id) {
 Editor.prototype.updateBlock = function updateBlock (id, data) {
   assert.equal(typeof id, 'number', 'id must be a number')
   assert.equal(typeof data, 'object', 'data must be an object')
-  this._app.store({ type: UPDATE_BLOCK, id, data })
+  this._emit({ type: UPDATE_BLOCK, id, data })
+}
+
+/**
+* Focus block
+* @param {number} id - id of block to focus
+* @example
+* const editor = new Editor()
+* editor.focusBlock(123)
+*/
+Editor.prototype.focusBlock = function focusBlock (id) {
+  assert.equal(typeof id, 'number', 'id must be a number')
+  this._emit({ type: FOCUS_BLOCK, id })
+}
+
+/**
+* Defocus block
+* @example
+* const editor = new Editor()
+* editor.defocusBlock()
+*/
+Editor.prototype.defocusBlock = function defocusBlock () {
+  this._emit({ type: DEFOCUS_BLOCK })
+}
+
+/**
+* Show toolbar
+* @param {number} afterBlockId - id of the block to insert after
+* @example
+* const editor = new Editor()
+* editor.showToolbar(123)
+*/
+Editor.prototype.showToolbar = function showToolbar (afterBlockId) {
+  assert.equal(typeof afterBlockId, 'number', 'afterBlockId must be a number')
+  this._emit({ type: SHOW_TOOLBAR, afterBlockId })
+}
+
+/**
+* Hide toolbar
+* @example
+* const editor = new Editor()
+* editor.hideToolbar()
+*/
+Editor.prototype.hideToolbar = function hideToolbar () {
+  this._emit({ type: HIDE_TOOLBAR })
 }
 
 /**
@@ -159,66 +217,102 @@ Editor.prototype._getBlockType = function getBlockType (name) {
 
 function modifier (action, state) {
   if (action.type === CREATE_BLOCK) {
-    return {
-      blocks: [].concat(state.blocks, [{
-        id: Date.now(),
-        name: action.name,
-        version: action.version,
-        data: action.data
-      }])
+    var targetIndex = state.blocks.length
+    if (typeof action.afterBlockId !== 'undefined') {
+      targetIndex = state.blocks.findIndex(function (block) {
+        return block.id === action.afterBlockId
+      }) + 1
     }
+    return xtend(state, {
+      blocks: state.blocks.slice(0, targetIndex)
+        .concat([{
+          id: action.id,
+          name: action.name,
+          version: action.version,
+          data: action.data
+        }])
+        .concat(state.blocks.slice(targetIndex))
+    })
   }
 
   if (action.type === UPDATE_BLOCK) {
-    return {
+    return xtend(state, {
       blocks: state.blocks.map(function (block) {
         if (block.id === action.id) {
           return xtend(block, { data: xtend(block.data, action.data) })
         }
         return block
       })
-    }
+    })
   }
 
   if (action.type === DELETE_BLOCK) {
-    return {
+    return xtend(state, {
       blocks: state.blocks.filter(function (block) {
         return block.id !== action.id
       })
-    }
+    })
+  }
+
+  if (action.type === FOCUS_BLOCK) {
+    return xtend(state, { focus: action.id })
+  }
+
+  if (action.type === DEFOCUS_BLOCK) {
+    return xtend(state, { focus: null })
+  }
+
+  if (action.type === SHOW_TOOLBAR) {
+    return xtend(state, { toolbar: action.afterBlockId })
+  }
+
+  if (action.type === HIDE_TOOLBAR) {
+    return xtend(state, { toolbar: null })
   }
 }
 
 function main (editor, state) {
-  return hx`<main>
-    ${state.blocks.map(block.bind(null, editor))}
-    ${toolbar(editor, hx, state)}
+  return yo`<main>
+    ${state.blocks.map(function (b) {
+      var bar
+      if (editor.state.toolbar === b.id) bar = toolbar(editor, state, b.id)
+      return yo`<div>
+        ${block(editor, b)}
+        ${bar}
+      </div>`
+    })}
   </main>`
-}
-
-function toolbar (editor, state) {
-  const blockTypes = Array.from(editor._blockTypes.values())
-
-  return blockTypes.map(function (blockType) {
-    return hx`<button onclick=${createBlock.bind(null, blockType.name)}>
-      Create ${blockType.name} block
-    </button>`
-  })
-
-  function createBlock (name) {
-    editor.createBlock(name)
-  }
 }
 
 function block (editor, state) {
   const blockType = editor._blockTypes.get(state.name)
 
-  return hx`<section>
+  return yo`<section>
     ${blockType.main(editor, state)}
     <button onclick=${deleteBlock}>Delete block</button>
   </section>`
 
   function deleteBlock () {
     editor.deleteBlock(state.id)
+  }
+}
+
+function toolbar (editor, state, afterBlockId) {
+  const blockTypes = Array.from(editor._blockTypes.values())
+
+  return yo`<div>
+    ${blockTypes.map(function (blockType, i) {
+      const button = yo`<button onclick=${createBlock.bind(null, blockType.name)}>
+        Create ${blockType.name} block
+      </button>`
+      if (i === 0) button.focus()
+      return button
+    })}
+  </div>`
+
+  function createBlock (name) {
+    const id = editor.createBlock(name, afterBlockId)
+    editor.hideToolbar()
+    editor.focusBlock(id)
   }
 }

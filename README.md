@@ -73,12 +73,26 @@ Create block
 **Parameters**
 
 -   `name` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** – block type name
+-   `afterBlockId` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** – id of block to insert after
 
 **Examples**
 
 ```javascript
 const editor = new Editor()
 editor.createBlock('text')
+```
+
+Returns **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** id of the block
+
+#### defocusBlock
+
+Defocus block
+
+**Examples**
+
+```javascript
+const editor = new Editor()
+editor.defocusBlock()
 ```
 
 #### deleteBlock
@@ -94,6 +108,47 @@ Delete block
 ```javascript
 const editor = new Editor()
 editor.deleteBlock(123)
+```
+
+#### focusBlock
+
+Focus block
+
+**Parameters**
+
+-   `id` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** id of block to focus
+
+**Examples**
+
+```javascript
+const editor = new Editor()
+editor.focusBlock(123)
+```
+
+#### hideToolbar
+
+Hide toolbar
+
+**Examples**
+
+```javascript
+const editor = new Editor()
+editor.hideToolbar()
+```
+
+#### showToolbar
+
+Show toolbar
+
+**Parameters**
+
+-   `afterBlockId` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** id of the block to insert after
+
+**Examples**
+
+```javascript
+const editor = new Editor()
+editor.showToolbar(123)
 ```
 
 #### updateBlock
@@ -129,6 +184,17 @@ editor.validateBlock(123)
 
 Returns **([Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)\|[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array))** an array of errors if there are any, otherwise `true`
 
+#### element
+
+Get editor DOM element
+
+**Examples**
+
+```javascript
+const editor = new Editor()
+document.body.appendChild(editor.element)
+```
+
 #### state
 
 Get editor state
@@ -138,15 +204,4 @@ Get editor state
 ```javascript
 const editor = new Editor()
 editor.state
-```
-
-#### tree
-
-Get editor DOM tree
-
-**Examples**
-
-```javascript
-const editor = new Editor()
-document.body.appendChild(editor.tree)
 ```
