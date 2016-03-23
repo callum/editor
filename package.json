@@ -8,7 +8,7 @@
     "build": "NODE_ENV=production browserify example.js -g unassertify",
     "stat": "npm run build | gzip-size | pretty-bytes",
     "doc": "documentation lint && documentation readme -s api",
-    "test": "standard"
+    "test": "standard && browserify test/*.js -d | tape-run"
   },
   "author": "Callum Jefferies <callum@callumj.uk> (http://callumj.uk/)",
   "license": "ISC",
@@ -28,6 +28,8 @@
     "gzip-size-cli": "^1.0.0",
     "pretty-bytes-cli": "^1.0.0",
     "standard": "^6.0.8",
+    "tape": "^4.5.1",
+    "tape-run": "^2.1.3",
     "unassertify": "^2.0.3"
   }
 }
