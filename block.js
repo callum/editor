@@ -37,7 +37,7 @@ Block.prototype.focus = function focus () {
 * block.blur()
 */
 Block.prototype.blur = function blur () {
-  this.editor._emit({ type: 'BLUR_BLOCK', id: this.id })
+  this.editor._emit({ type: 'blur_block', id: this.id })
 }
 
 /**
@@ -51,7 +51,7 @@ Block.prototype.blur = function blur () {
 Block.prototype.updateData = function updateData (data) {
   assert.equal(typeof data, 'object', 'data must be an object')
   this.editor._emit({
-    type: 'UPDATE_BLOCK_DATA',
+    type: 'update_block_data',
     version: this.version,
     id: this.id,
     data
@@ -69,7 +69,7 @@ Block.prototype.updateData = function updateData (data) {
 Block.prototype.updateState = function updateState (state) {
   assert.equal(typeof state, 'object', 'state must be an object')
   this.editor._emit({
-    type: 'UPDATE_BLOCK_STATE',
+    type: 'update_block_state',
     version: this.version,
     id: this.id,
     state

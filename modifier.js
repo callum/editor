@@ -3,75 +3,57 @@ const xtend = require('xtend')
 module.exports = modifier
 
 function modifier (action, state) {
-  if (action.type === 'SHOW_TOOLBAR') {
-    return xtend(state, { toolbar: action.position })
+  if (action.type === 'show_toolbar') {
+    state.toolbar = action.position
   }
 
-  if (action.type === 'HIDE_TOOLBAR') {
-    return xtend(state, { toolbar: null })
+  if (action.type === 'hide_toolbar') {
+    state.toolbar = null
   }
 
-  if (action.type === 'CREATE_BLOCK') {
+  if (action.type === 'create_block') {
     var targetIndex = state.blocks.length
     if (typeof action.position !== 'undefined') {
-      targetIndex = state.blocks.findIndex(function (block) {
-        return block.id === action.position
+      targetIndex = state.blocks.findIndex(function (b) {
+        return b.id === action.position
       }) + 1
     }
-    return xtend(state, {
-      blocks: state.blocks.slice(0, targetIndex)
-        .concat([{
-          id: action.id,
-          name: action.name,
-          version: action.version,
-          data: action.data,
-          state: action.state
-        }])
-        .concat(state.blocks.slice(targetIndex))
+    state.blocks.splice(targetIndex, 0, {
+      id: action.id,
+      name: action.name,
+      version: action.version,
+      data: action.data,
+      state: action.state
     })
   }
 
-  if (action.type === 'DELETE_BLOCK') {
-    return xtend(state, {
-      blocks: state.blocks.filter(function (block) {
-        return block.id !== action.id
-      })
+  if (action.type === 'delete_block') {
+    state.blocks = state.blocks.filter(function (b) {
+      return b.id !== action.id
     })
   }
 
-  if (action.type === 'UPDATE_BLOCK_DATA') {
-    return xtend(state, {
-      blocks: state.blocks.map(function (block) {
-        if (block.id === action.id) {
-          return xtend(block, {
-            version: action.version,
-            data: xtend(block.data, action.data)
-          })
-        }
-        return block
-      })
+  if (action.type === 'update_block_data') {
+    const block = state.blocks.find(function (b) {
+      return b.id === action.id
     })
+    block.data = xtend(block.data, action.data)
   }
 
-  if (action.type === 'UPDATE_BLOCK_STATE') {
-    return xtend(state, {
-      blocks: state.blocks.map(function (block) {
-        if (block.id === action.id) {
-          return xtend(block, {
-            version: action.version,
-            state: xtend(block.state, action.state)
-          })
-        }
-        return block
-      })
+  if (action.type === 'update_block_state') {
+    const block = state.blocks.find(function (b) {
+      return b.id === action.id
     })
+    block.state = xtend(block.state, action.state)
   }
 
-  if (action.type === 'FOCUS_BLOCK') {
-    return xtend(state, { focus: action.id })
+  if (action.type === 'focus_block') {
+    state.focus = action.id
   }
 
-  if (action.type === 'BLUR_BLOCK') {
-    return xtend(state, { focus: null })
+  if (action.type === 'blur_block') {
+    state.focus = null
   }
+
+  return state
 }

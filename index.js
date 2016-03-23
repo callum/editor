@@ -24,6 +24,7 @@ function Editor (initialState) {
   this._emitter.on('*', handleUpdate.bind(this))
 
   function handleUpdate (_, state) {
+    // use requestAnimationFrame to reduce the number of calls to this
     yo.update(this.element, elements.main(this, state))
   }
 }
@@ -117,7 +118,7 @@ Editor.prototype.addBlockType = function addBlockType (blockType) {
 */
 Editor.prototype.showToolbar = function showToolbar (position) {
   assert.equal(typeof position, 'number', 'position must be a number')
-  this._emit({ type: 'SHOW_TOOLBAR', position })
+  this._emit({ type: 'show_toolbar', position })
 }
 
 /**
@@ -127,7 +128,7 @@ Editor.prototype.showToolbar = function showToolbar (position) {
 * editor.hideToolbar()
 */
 Editor.prototype.hideToolbar = function hideToolbar () {
-  this._emit({ type: 'HIDE_TOOLBAR' })
+  this._emit({ type: 'hide_toolbar' })
 }
 
 /**
@@ -143,7 +144,7 @@ Editor.prototype.createBlock = function createBlock (name, position) {
   const blockType = this._getBlockType(name)
   const id = Date.now()
   this._emit({
-    type: 'CREATE_BLOCK',
+    type: 'create_block',
     name: blockType.name,
     version: blockType.version,
     data: blockType.initialData,
@@ -163,7 +164,7 @@ Editor.prototype.createBlock = function createBlock (name, position) {
 */
 Editor.prototype.deleteBlock = function deleteBlock (id) {
   assert.equal(typeof id, 'number', 'id must be a number')
-  this._emit({ type: 'DELETE_BLOCK', id })
+  this._emit({ type: 'delete_block', id })
 }
 
 Editor.prototype._getBlockType = function getBlockType (name) {

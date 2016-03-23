@@ -18,7 +18,7 @@ function block (editor, state) {
 }
 
 function main (editor, state) {
-  if (!editor.blocks.length) return toolbar(editor, state)
+  if (!editor.blocks.length) return yo`<main>${toolbar(editor, state)}</main>`
 
   return yo`<main>
     ${editor.blocks.map(function (b) {
@@ -48,6 +48,6 @@ function toolbar (editor, state, position) {
   function createBlock (name) {
     const id = editor.createBlock(name, position)
     editor.hideToolbar()
-    editor._emit({ type: 'FOCUS_BLOCK', id })
+    editor._emit({ type: 'focus_block', id })
   }
 }
