@@ -2,36 +2,28 @@ const yo = require('yo-yo')
 
 module.exports = text
 
-function text (editor, state) {
-  const errors = editor.validateBlock(state.id)
+function text (editor, block) {
+  const errors = block.validate()
   if (errors && errors.length) console.log(errors)
 
-  const textarea = yo`<textarea
-    oninput=${handleInput}
-    onkeydown=${handleKeyDown}
-    onfocus=${handleFocus}
-    onblur=${handleBlur}>${state.data.text}</textarea>`
+  const textarea = yo`<textarea>${block.data.text}</textarea>`
+  textarea.oninput = handleInput
+  textarea.onkeydown = handleKeyDown
+  textarea.onfocus = block.focus.bind(block)
+  textarea.onblur = block.blur.bind(block)
 
-  if (editor.state.focus === state.id) textarea.focus()
+  if (editor.state.focus === block.id) textarea.focus()
 
   return textarea
 
   function handleInput (event) {
-    editor.updateBlock(state.id, { text: event.target.value })
+    block.updateData({ text: event.target.value })
   }
 
   function handleKeyDown (event) {
     if (event.keyCode === 13) {
-      editor.showToolbar(state.id)
+      editor.showToolbar(block.id)
       event.preventDefault()
     }
-  }
-
-  function handleFocus () {
-    editor.focusBlock(state.id)
-  }
-
-  function handleBlur () {
-    editor.defocusBlock()
   }
 }

@@ -6,8 +6,8 @@
 -   [x] self-contained editor constructor
 -   [x] state-driven user interface
 -   [x] versioned block types
+-   [x] block type state management
 -   [ ] block type primitives
--   [ ] block type state management
 -   [ ] contributing guide
 -   [ ] customisable styling
 -   [ ] i18n
@@ -34,7 +34,7 @@ document.body.appendChild(editor.tree)
 
 ### Editor
 
-Create an editor
+Instantiate an editor
 
 **Parameters**
 
@@ -58,6 +58,7 @@ Add block type
     -   `blockType.main` **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)** – block type function
     -   `blockType.schema` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** – block type schema
     -   `blockType.initialData` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** – block type initial data
+    -   `blockType.initialState` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** – block type initial state
 
 **Examples**
 
@@ -73,7 +74,7 @@ Create block
 **Parameters**
 
 -   `name` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** – block type name
--   `afterBlockId` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** – id of block to insert after
+-   `position` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** – id of block to position after
 
 **Examples**
 
@@ -83,17 +84,6 @@ editor.createBlock('text')
 ```
 
 Returns **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** id of the block
-
-#### defocusBlock
-
-Defocus block
-
-**Examples**
-
-```javascript
-const editor = new Editor()
-editor.defocusBlock()
-```
 
 #### deleteBlock
 
@@ -108,21 +98,6 @@ Delete block
 ```javascript
 const editor = new Editor()
 editor.deleteBlock(123)
-```
-
-#### focusBlock
-
-Focus block
-
-**Parameters**
-
--   `id` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** id of block to focus
-
-**Examples**
-
-```javascript
-const editor = new Editor()
-editor.focusBlock(123)
 ```
 
 #### hideToolbar
@@ -142,7 +117,7 @@ Show toolbar
 
 **Parameters**
 
--   `afterBlockId` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** id of the block to insert after
+-   `position` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** id of the block to position after
 
 **Examples**
 
@@ -151,38 +126,16 @@ const editor = new Editor()
 editor.showToolbar(123)
 ```
 
-#### updateBlock
+#### blocks
 
-Update block data
-
-**Parameters**
-
--   `id` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** id of the block to update
--   `data` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
+Get blocks
 
 **Examples**
 
 ```javascript
 const editor = new Editor()
-editor.updateBlock(123, { text: 'abc' })
+editor.blocks
 ```
-
-#### validateBlock
-
-Validate block data
-
-**Parameters**
-
--   `id` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** id of the block to validate
-
-**Examples**
-
-```javascript
-const editor = new Editor()
-editor.validateBlock(123)
-```
-
-Returns **([Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)\|[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array))** an array of errors if there are any, otherwise `true`
 
 #### element
 
@@ -205,3 +158,88 @@ Get editor state
 const editor = new Editor()
 editor.state
 ```
+
+### Block
+
+Instantiate a block
+
+**Parameters**
+
+-   `editor` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** associated editor instance
+-   `block` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** plain block object
+
+**Examples**
+
+```javascript
+const editor = new Editor()
+```
+
+#### blur
+
+Blur block
+
+**Examples**
+
+```javascript
+const editor = new Editor()
+const block = editor.blocks.find(b => b.id === 123)
+block.blur()
+```
+
+#### focus
+
+Focus block
+
+**Examples**
+
+```javascript
+const editor = new Editor()
+const block = editor.blocks.find(b => b.id === 123)
+block.focus()
+```
+
+#### updateData
+
+Update block data
+
+**Parameters**
+
+-   `data` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
+
+**Examples**
+
+```javascript
+const editor = new Editor()
+const block = editor.blocks.find(b => b.id === 123)
+block.updateData({ text: 'abc' })
+```
+
+#### updateState
+
+Update block state
+
+**Parameters**
+
+-   `state` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
+
+**Examples**
+
+```javascript
+const editor = new Editor()
+const block = editor.blocks.find(b => b.id === 123)
+block.updateState({ edit: true })
+```
+
+#### validate
+
+Validate block data
+
+**Examples**
+
+```javascript
+const editor = new Editor()
+const block = editor.blocks.find(b => b.id === 123)
+block.validate()
+```
+
+Returns **([Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)\|[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array))** an array of errors if there are any, otherwise `true`
