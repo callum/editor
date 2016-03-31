@@ -7,8 +7,6 @@ module.exports = Block
 * Instantiate a block
 * @param {Object} editor - associated editor instance
 * @param {Object} block - plain block object
-* @example
-* const editor = new Editor()
 */
 function Block (editor, block) {
   assert.equal(typeof block, 'object', 'block must be an object')

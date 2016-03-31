@@ -40,15 +40,9 @@ function Editor (initialState) {
 */
 Object.defineProperty(Editor.prototype, 'element', {
   get () {
-    if (typeof this._element !== 'undefined') return this._element
-    this.blocks.forEach(function (block) {
-      const errors = block.validate()
-      if (errors.length) {
-        const error = errors[0]
-        throw new Error(`${error.field} ${error.message} at block with id '${block.id}'`)
-      }
-    }, this)
-    this._element = elements.main(this, this.state)
+    if (typeof this._element === 'undefined') {
+      this._element = elements.main(this, this.state)
+    }
     return this._element
   }
 })
