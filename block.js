@@ -17,28 +17,6 @@ function Block (editor, block) {
 }
 
 /**
-* Focus block
-* @example
-* const editor = new Editor()
-* const block = editor.blocks.find(b => b.id === 123)
-* block.focus()
-*/
-Block.prototype.focus = function focus () {
-  this.editor._emit({ type: 'FOCUS_BLOCK', id: this.id })
-}
-
-/**
-* Blur block
-* @example
-* const editor = new Editor()
-* const block = editor.blocks.find(b => b.id === 123)
-* block.blur()
-*/
-Block.prototype.blur = function blur () {
-  this.editor._emit({ type: 'blur_block', id: this.id })
-}
-
-/**
 * Update block data
 * @param {Object} data
 * @example

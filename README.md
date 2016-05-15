@@ -47,7 +47,7 @@ Add block type
 
 **Parameters**
 
--   `blockType` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**
+-   `blockType` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
     -   `blockType.name` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** – block type name
     -   `blockType.version` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** – block type version
     -   `blockType.main` **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)** – block type function
@@ -163,37 +163,13 @@ Instantiate a block
 -   `editor` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** associated editor instance
 -   `block` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** plain block object
 
-#### blur
-
-Blur block
-
-**Examples**
-
-```javascript
-const editor = new Editor()
-const block = editor.blocks.find(b => b.id === 123)
-block.blur()
-```
-
-#### focus
-
-Focus block
-
-**Examples**
-
-```javascript
-const editor = new Editor()
-const block = editor.blocks.find(b => b.id === 123)
-block.focus()
-```
-
 #### updateData
 
 Update block data
 
 **Parameters**
 
--   `data` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**
+-   `data` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
 
 **Examples**
 
@@ -209,7 +185,7 @@ Update block state
 
 **Parameters**
 
--   `state` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**
+-   `state` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
 
 **Examples**
 

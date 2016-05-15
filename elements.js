@@ -36,11 +36,10 @@ function toolbar (editor, state, position) {
   const blockTypes = Array.from(editor._blockTypes.values())
 
   return yo`<div>
-    ${blockTypes.map(function (blockType, i) {
-      const button = yo`<button onclick=${createBlock.bind(null, blockType.name)}>
+    ${blockTypes.map(function (blockType) {
+      const button = yo`<button autofocus onclick=${createBlock.bind(null, blockType.name)}>
         Create ${blockType.name} block
       </button>`
-      if (i === 0) button.focus()
       return button
     })}
   </div>`
@@ -48,6 +47,5 @@ function toolbar (editor, state, position) {
   function createBlock (name) {
     const id = editor.createBlock(name, position)
     editor.hideToolbar()
-    editor._emit({ type: 'focus_block', id })
   }
 }

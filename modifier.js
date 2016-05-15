@@ -47,13 +47,5 @@ function modifier (action, state) {
     block.state = xtend(block.state, action.state)
   }
 
-  if (action.type === 'focus_block') {
-    state.focus = action.id
-  }
-
-  if (action.type === 'blur_block') {
-    state.focus = null
-  }
-
   return state
 }
