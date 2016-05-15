@@ -26,7 +26,7 @@ function Block (editor, block) {
 */
 Block.prototype.updateData = function updateData (data) {
   assert.equal(typeof data, 'object', 'data must be an object')
-  this.editor._emit({
+  this.editor._send({
     type: 'update_block_data',
     version: this.version,
     id: this.id,
@@ -44,7 +44,7 @@ Block.prototype.updateData = function updateData (data) {
 */
 Block.prototype.updateState = function updateState (state) {
   assert.equal(typeof state, 'object', 'state must be an object')
-  this.editor._emit({
+  this.editor._send({
     type: 'update_block_state',
     version: this.version,
     id: this.id,

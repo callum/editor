@@ -17,7 +17,7 @@
     "deep-equal": "^1.0.1",
     "defined": "^1.0.0",
     "is-my-json-valid": "^2.13.1",
-    "store-emitter": "^2.1.0",
+    "send-action": "^1.1.0",
     "xtend": "^4.0.1",
     "yo-yo": "^1.1.1"
   },

@@ -1,6 +1,6 @@
 const assert = require('assert')
 const defined = require('defined')
-const emitter = require('store-emitter')
+const sendAction = require('send-action')
 const validator = require('is-my-json-valid')
 const yo = require('yo-yo')
 const Block = require('./block')
@@ -19,12 +19,13 @@ function Editor (initialState) {
   const state = defined(initialState, { blocks: [] })
   this._blockTypes = new Map()
   this._validators = new Map()
-  this._emitter = emitter(modifier, state)
-  this._emit = this._emitter
-  this._emitter.on('*', handleUpdate.bind(this))
+  this._send = sendAction({
+    onaction: modifier,
+    onchange: onchange.bind(this),
+    state
+  })
 
-  function handleUpdate (_, state) {
-    // use requestAnimationFrame to reduce the number of calls to this
+  function onchange (action, state) {
     yo.update(this.element, elements.main(this, state))
   }
 }
@@ -58,7 +59,7 @@ Object.defineProperty(Editor.prototype, 'element', {
 */
 Object.defineProperty(Editor.prototype, 'state', {
   get () {
-    return this._emitter.getState()
+    return this._send.state()
   }
 })
 
@@ -112,7 +113,7 @@ Editor.prototype.addBlockType = function addBlockType (blockType) {
 */
 Editor.prototype.showToolbar = function showToolbar (position) {
   assert.equal(typeof position, 'number', 'position must be a number')
-  this._emit({ type: 'show_toolbar', position })
+  this._send({ type: 'show_toolbar', position })
 }
 
 /**
@@ -122,7 +123,7 @@ Editor.prototype.showToolbar = function showToolbar (position) {
 * editor.hideToolbar()
 */
 Editor.prototype.hideToolbar = function hideToolbar () {
-  this._emit({ type: 'hide_toolbar' })
+  this._send({ type: 'hide_toolbar' })
 }
 
 /**
@@ -137,7 +138,7 @@ Editor.prototype.hideToolbar = function hideToolbar () {
 Editor.prototype.createBlock = function createBlock (name, position) {
   const blockType = this._getBlockType(name)
   const id = Date.now()
-  this._emit({
+  this._send({
     type: 'create_block',
     name: blockType.name,
     version: blockType.version,
@@ -158,7 +159,7 @@ Editor.prototype.createBlock = function createBlock (name, position) {
 */
 Editor.prototype.deleteBlock = function deleteBlock (id) {
   assert.equal(typeof id, 'number', 'id must be a number')
-  this._emit({ type: 'delete_block', id })
+  this._send({ type: 'delete_block', id })
 }
 
 Editor.prototype._getBlockType = function getBlockType (name) {
